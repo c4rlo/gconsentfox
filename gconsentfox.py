@@ -38,8 +38,8 @@ def main():
     print("Inserting Google cookie consent cookies...")
     db = sqlite3.connect(get_cookies_filename(), timeout=0.25)
     cur = db.cursor()
-    expiry_ts = datetime.datetime(2100, 1, 1, tzinfo=datetime.timezone.utc).timestamp()
-    now_tsms = datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1000000
+    expiry_ts = datetime.datetime(2100, 1, 1, tzinfo=datetime.UTC).timestamp()
+    now_tsms = datetime.datetime.now(tz=datetime.UTC).timestamp() * 1000000
     try:
         for cookie in COOKIES:
             cur.execute(SQL, (*cookie, expiry_ts, now_tsms, now_tsms))
