@@ -48,7 +48,7 @@ def main():
     db.commit()
     db.close()
     print("Starting Firefox...")
-    os.execv("/usr/bin/firefox", sys.argv)
+    os.execl("/usr/bin/firefox", "/usr/bin/firefox", *sys.argv[1:])
 
 
 main()
