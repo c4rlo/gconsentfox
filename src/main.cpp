@@ -152,13 +152,28 @@ int insertCookies()
 
     std::cout << "Inserting Google cookie consent cookies" << std::endl;
 
+    int rc = sqlite3_config(SQLITE_CONFIG_SINGLETHREAD);
+    if (reportSqliteError("set SQLite single-thread mode", rc)) {
+        return 1;
+    }
+
     sqlite3* db{};
-    int rc = sqlite3_open_v2(cookiesPath->c_str(), &db,
+    rc = sqlite3_open_v2(cookiesPath->c_str(), &db,
                              SQLITE_OPEN_READWRITE | SQLITE_OPEN_EXRESCODE, nullptr);
     if (reportSqliteError("open cookies database", rc)) {
         return 1;
     }
     SqliteGuard sqliteGuard{db};
+
+    rc = sqlite3_exec(db, "PRAGMA synchronous=NORMAL", nullptr, nullptr, nullptr);
+    if (reportSqliteError("set synchronous=NORMAL mode", rc)) {
+        return 1;
+    }
+
+    rc = sqlite3_exec(db, "BEGIN", nullptr, nullptr, nullptr);
+    if (reportSqliteError("begin transaction", rc)) {
+        return 1;
+    }
 
     sqlite3_stmt* insertStmt;
     rc = sqlite3_prepare_v2(db, SQL, sizeof(SQL), &insertStmt, nullptr);
@@ -166,11 +181,6 @@ int insertCookies()
         return 1;
     }
     SqliteStmtGuard stmtGuard{insertStmt};
-
-    rc = sqlite3_exec(db, "BEGIN", nullptr, nullptr, nullptr);
-    if (reportSqliteError("begin transaction", rc)) {
-        return 1;
-    }
 
     const auto now = std::chrono::system_clock::now().time_since_epoch();
     const auto nowMicros =
