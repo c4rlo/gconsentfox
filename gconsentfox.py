@@ -8,6 +8,8 @@ import sqlite3
 import sys
 
 
+FIREFOX_BIN = "/usr/bin/firefox"
+
 COOKIES = (  # name, value, host
     ("ANID", "OPT_OUT", ".google.com"),
     ("ANID", "OPT_OUT", ".google.co.uk"),
@@ -35,7 +37,7 @@ def get_cookies_filename():
 
 
 def main():
-    print("Inserting Google cookie consent cookies...")
+    print("Inserting Google cookie consent cookies")
     db = sqlite3.connect(get_cookies_filename(), timeout=0.25)
     cur = db.cursor()
     expiry_ts = datetime.datetime(2100, 1, 1, tzinfo=datetime.UTC).timestamp()
@@ -47,8 +49,8 @@ def main():
         print(f"Failed to add cookies: {e}. Firefox already running?")
     db.commit()
     db.close()
-    print("Starting Firefox...")
-    os.execl("/usr/bin/firefox", "/usr/bin/firefox", *sys.argv[1:])
+    print("Starting Firefox")
+    os.execl(FIREFOX_BIN, FIREFOX_BIN, *sys.argv[1:])
 
 
 main()
