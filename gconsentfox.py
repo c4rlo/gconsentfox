@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+# This is the Python version. Deprecated, since it is slower than the C++ version.
+
 import configparser
 import datetime
 import os
