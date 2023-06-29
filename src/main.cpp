@@ -245,6 +245,7 @@ int main(int argc, char* argv[])
     if (argc >= 2) {
         firefoxArgv.insert(firefoxArgv.end(), argv + 1, argv + argc);
     }
+    firefoxArgv.push_back(nullptr);
 
     std::cout << "Starting Firefox" << std::endl;
 
