@@ -5,7 +5,7 @@
 #include <cerrno>
 #include <chrono>
 #include <cstdlib>
-#include <format>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <optional>
@@ -67,12 +67,12 @@ bool reportSqliteError(std::string_view action, int code)
     }
 
     std::cerr << "Failed to " << action << ": " << sqlite3_errstr(code) << '\n';
-    
+
     return true;
 }
 
 
-std::optional<std::string> firefoxProfilesPath()
+std::optional<std::filesystem::path> firefoxProfilesPath()
 {
     const char* homeDir = std::getenv("HOME");
     if (!homeDir) {
@@ -84,32 +84,32 @@ std::optional<std::string> firefoxProfilesPath()
         homeDir = pwd->pw_dir;
     }
 
-    return homeDir + std::string("/.mozilla/firefox");
+    return std::filesystem::path(homeDir) / ".mozilla/firefox";
 }
 
 
-std::optional<std::string> firefoxCookiesDbPath()
+std::optional<std::filesystem::path> firefoxCookiesDbPath()
 {
     const auto profilePath = firefoxProfilesPath();
     if (!profilePath) {
         return {};
     }
-    const std::string profilesIniPath = *profilePath + "/profiles.ini";
+    const auto profilesIniPath = *profilePath / "profiles.ini";
     std::ifstream profilesIni(profilesIniPath);
     if (!profilesIni) {
         std::cerr << "Failed to open " << profilesIniPath << '\n';
         return {};
     }
 
+    const char defaultEq[] = "Default=";
     bool inInstallSection = false;
     std::string line;
     while (getline(profilesIni, line)) {
         if (line.starts_with('[')) {
             inInstallSection = line.starts_with("[Install");
         }
-        else if (inInstallSection && line.starts_with("Default=")) {
-            return std::format("{}/{}/{}", *profilePath, line.substr(8),
-                               "cookies.sqlite");
+        else if (inInstallSection && line.starts_with(defaultEq)) {
+            return *profilePath / line.substr(std::size(defaultEq) - 1) / "cookies.sqlite";
         }
     }
 

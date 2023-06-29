@@ -12,7 +12,7 @@ CXXFLAGS_debug := -ggdb3 -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBU
 LDFLAGS := $(LDFLAGS) -pipe
 LDFLAGS_release := -flto -s
 LDFLAGS_debug := -fsanitize=address -fsanitize=undefined
-LDLIBS := -lstdc++ -lm $(shell pkg-config --libs $(pc-libs))
+LDLIBS := -lstdc++ $(shell pkg-config --libs $(pc-libs))
 
 MAKEFLAGS := -j $(shell nproc)
 .DEFAULT_GOAL := debug
