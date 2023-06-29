@@ -119,7 +119,7 @@ std::optional<std::string> firefoxCookiesDbPath()
 
 
 struct SqliteGuard {
-    sqlite3* db;
+    sqlite3* db{};
     ~SqliteGuard()
     {
         reportSqliteError("close database", sqlite3_close(db));
@@ -128,7 +128,7 @@ struct SqliteGuard {
 
 
 struct SqliteStmtGuard {
-    sqlite3_stmt* stmt;
+    sqlite3_stmt* stmt{};
     ~SqliteStmtGuard()
     {
         reportSqliteError("finalize prepared statement", sqlite3_finalize(stmt));
@@ -175,7 +175,7 @@ int insertCookies()
         return 1;
     }
 
-    sqlite3_stmt* insertStmt;
+    sqlite3_stmt* insertStmt{};
     rc = sqlite3_prepare_v2(db, SQL, sizeof(SQL), &insertStmt, nullptr);
     if (reportSqliteError("prepare SQL statement", rc)) {
         return 1;
